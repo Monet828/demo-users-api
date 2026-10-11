@@ -13,8 +13,11 @@ export function listUsers(query = {}, users = USERS) {
     id: u.id,
     name: u.name,
     role: u.role,
-    team: u.team.name,
+    team: u.team ? u.team.name : null,
   }));
-  const latest = matched.reduce((a, b) => (a.lastActive > b.lastActive ? a : b));
-  return { users: items, total: matched.length, page, lastActive: latest.lastActive };
+  const used = matched.filter((u) => u.lastActive);
+  const latest = used.length
+    ? used.reduce((a, b) => (a.lastActive > b.lastActive ? a : b))
+    : null;
+  return { users: items, total: matched.length, page, lastActive: latest ? latest.lastActive : null };
 }
