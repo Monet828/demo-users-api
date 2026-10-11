@@ -1,18 +1,23 @@
 // CI だけで走る API の回帰試験（Worker の Agent からは見えない。Harness が走らせる）。
+// 通信はせず、HTTP の handler を直接呼ぶ（隔離の中では localhost の任意の port に接続できないため）。
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import http from "node:http";
 import { handle } from "../src/server.js";
 
-async function get(path) {
-  const server = http.createServer(handle);
-  await new Promise((r) => server.listen(0, "127.0.0.1", r));
-  try {
-    const res = await fetch(`http://127.0.0.1:${server.address().port}${path}`);
-    return { status: res.status, body: await res.json() };
-  } finally {
-    server.close();
-  }
+function get(path) {
+  return new Promise((resolve) => {
+    const res = {
+      status: 0,
+      writeHead(status) {
+        this.status = status;
+        return this;
+      },
+      end(body) {
+        resolve({ status: this.status, body: JSON.parse(body) });
+      },
+    };
+    handle({ method: "GET", url: path }, res);
+  });
 }
 
 test("一致する利用者がいなくても 200 で空の一覧を返す", async () => {
