@@ -1,0 +1,16 @@
+name: CI
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: 試験（npm test）
+        run: npm test
+      - name: API の回帰試験（本番に近いデータ）
+        run: node --test "ci/**/*.test.js"
