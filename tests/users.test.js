@@ -8,6 +8,21 @@ test("全員を返す", () => {
   assert.equal(r.users[0].name, "佐藤 花子");
 });
 
+test("team が null の利用者は team を null で返す", () => {
+  const r = listUsers({}, [{ id: 1, name: "a", role: "user", team: null, lastActive: "2026-10-01T00:00:00Z" }]);
+  assert.equal(r.users[0].team, null);
+});
+
+test("lastActive が null の利用者は lastActive の計算に入れない", () => {
+  const users = [
+    { id: 1, name: "a", role: "user", team: null, lastActive: null },
+    { id: 2, name: "b", role: "user", team: { name: "t" }, lastActive: "2026-10-01T00:00:00Z" },
+    { id: 3, name: "c", role: "user", team: null, lastActive: null },
+  ];
+  assert.equal(listUsers({}, users).lastActive, "2026-10-01T00:00:00Z");
+  assert.equal(listUsers({}, [users[0]]).lastActive, null);
+});
+
 test("role で絞り込む", () => {
   const r = listUsers({ role: "admin" });
   assert.deepEqual(r.users.map((u) => u.id), [1]);
