@@ -17,3 +17,15 @@
 ```
 
 - `lastActive` は、絞り込んだ利用者のうち最後に使った時刻。
+
+## API の使い方とエラーの応答
+
+| status | body | いつ |
+|---|---|---|
+| 200 | 上の形 | 一致する利用者がいない場合も 200 で `users: []`・`total: 0`・`lastActive: null` |
+| 404 | `{ "error": "not_found" }` | 知らない path |
+| 500 | `{ "error": "internal_error" }` | 予期しない失敗（ログを確かめる） |
+
+## GET /health
+
+死活監視用。200 で `{ "status": "ok" }` を返す。
