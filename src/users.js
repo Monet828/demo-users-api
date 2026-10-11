@@ -13,8 +13,10 @@ export function listUsers(query = {}, users = USERS) {
     id: u.id,
     name: u.name,
     role: u.role,
-    team: u.team.name,
+    team: u.team?.name ?? null,
   }));
-  const latest = matched.reduce((a, b) => (a.lastActive > b.lastActive ? a : b));
-  return { users: items, total: matched.length, page, lastActive: latest.lastActive };
+  // 該当者がいない場合や一度も使っていない利用者は計算に入れない
+  const times = matched.map((u) => u.lastActive).filter(Boolean);
+  const lastActive = times.length ? times.reduce((a, b) => (a > b ? a : b)) : null;
+  return { users: items, total: matched.length, page, lastActive };
 }
