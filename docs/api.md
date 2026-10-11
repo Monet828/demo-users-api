@@ -6,7 +6,7 @@
 
 | query | 意味 |
 |---|---|
-| role | この role の利用者だけ（admin・member・contractor。省略すると社員の admin・member だけ） |
+| role | この role の利用者だけ（省略すると全員） |
 | page | 1 から（既定 1） |
 | size | 1 ページの件数（既定 20） |
 

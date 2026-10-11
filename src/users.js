@@ -8,8 +8,7 @@ export function listUsers(query = {}, users = USERS) {
   const role = query.role || null;
   const page = Number(query.page ?? 1);
   const size = Number(query.size ?? 20);
-  // role を省略したときは社員（admin・member）だけ。業務委託（contractor）は role=contractor で明示したときだけ返す。
-  const matched = role ? users.filter((u) => u.role === role) : users.filter((u) => u.role !== "contractor");
+  const matched = role ? users.filter((u) => u.role === role) : users;
   const items = matched.slice((page - 1) * size, page * size).map((u) => ({
     id: u.id,
     name: u.name,
