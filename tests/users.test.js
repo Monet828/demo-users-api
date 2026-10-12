@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { listUsers } from "../src/users.js";
+import { handle } from "../src/server.js";
 
 test("全員を返す", () => {
   const r = listUsers({});
@@ -27,4 +28,18 @@ test("role で絞り込む", () => {
   const r = listUsers({ role: "admin" });
   assert.deepEqual(r.users.map((u) => u.id), [1]);
   assert.equal(r.lastActive, "2026-10-09T09:12:00Z");
+});
+
+test("GET /api/users/:id で存在しない ID は 404 と not_found を返す", () => {
+  const res = {
+    writeHead(statusCode) {
+      this.statusCode = statusCode;
+    },
+    end(body) {
+      this.body = body;
+    },
+  };
+  handle({ method: "GET", url: "/api/users/99999" }, res);
+  assert.equal(res.statusCode, 404);
+  assert.equal(res.body, '{"error":"not_found"}');
 });
