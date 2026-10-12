@@ -3,6 +3,15 @@ import { USERS } from "./data.js";
 export class InvalidQueryError extends Error {}
 
 /**
+ * GET /api/users/:id の中身。見つからなければ null を返す。
+ */
+export function getUser(id, users = USERS) {
+  const u = users.find((x) => String(x.id) === id);
+  if (!u) return null;
+  return { id: u.id, name: u.name, role: u.role, team: u.team?.name ?? null };
+}
+
+/**
  * GET /api/users の中身。role で絞り込み、page・size でページに分ける。
  * 返す形は docs/api.md のとおり。
  */

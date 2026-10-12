@@ -50,3 +50,16 @@ for (const q of ["page=abc", "page=0", "page=-1", "size=abc", "size=0", "size=-1
 test("size=100 は有効", () => {
   assert.equal(get("/api/users?size=100").status, 200);
 });
+
+test("GET /api/users/:id は該当の利用者を返す", () => {
+  const res = get("/api/users/1");
+  assert.equal(res.status, 200);
+  assert.equal(JSON.parse(res.body).id, 1);
+  assert.equal(JSON.parse(res.body).name, "佐藤 花子");
+});
+
+test("GET /api/users/:id は存在しない id で 404 not_found を返す", () => {
+  const res = get("/api/users/999");
+  assert.equal(res.status, 404);
+  assert.deepEqual(JSON.parse(res.body), { error: "not_found" });
+});
