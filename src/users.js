@@ -1,4 +1,13 @@
-import { USERS } from "./data.js";
+import { USERS, findById } from "./data.js";
+
+/**
+ * id で利用者を 1 件返す。見つからなければ null。
+ */
+export function getUser(id) {
+  const u = findById(id);
+  if (!u) return null;
+  return { id: u.id, name: u.name, role: u.role, team: u.team?.name ?? null };
+}
 
 /**
  * GET /api/users の中身。role で絞り込み、page・size でページに分ける。

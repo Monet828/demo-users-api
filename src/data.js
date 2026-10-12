@@ -5,3 +5,8 @@ export const USERS = [
   { id: 3, name: "高橋 美咲", role: "member", team: { id: 10, name: "基盤" }, lastActive: "2026-10-08T07:05:00Z" },
   { id: 5, name: "伊藤 さくら", role: "member", team: { id: 12, name: "検索" }, lastActive: "2026-10-11T02:15:00Z" },
 ];
+
+// id で利用者を 1 件引く。見つからなければ null を返す。
+export function findById(id) {
+  return USERS.find((u) => u.id === Number(id)) ?? null;
+}

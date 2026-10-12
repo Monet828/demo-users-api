@@ -1,6 +1,18 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { listUsers } from "../src/users.js";
+import { listUsers, getUser } from "../src/users.js";
+import { findById } from "../src/data.js";
+
+test("findById は id で利用者を返し、無ければ null", () => {
+  assert.equal(findById(2).name, "鈴木 一郎");
+  assert.equal(findById("5").name, "伊藤 さくら");
+  assert.equal(findById(4), null);
+});
+
+test("getUser は findById の結果を整形して返す", () => {
+  assert.deepEqual(getUser(1), { id: 1, name: "佐藤 花子", role: "admin", team: "基盤" });
+  assert.equal(getUser(999), null);
+});
 
 test("全員を返す", () => {
   const r = listUsers({});
