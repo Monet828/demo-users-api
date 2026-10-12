@@ -39,6 +39,24 @@ test("role で絞り込む", () => {
   assert.equal(r.lastActive, "2026-10-09T09:12:00Z");
 });
 
+test("name 検索 (q) は case-insensitive: q=alice で Alice が返る", () => {
+  const users = [
+    { id: 1, name: "Alice", role: "user", team: null, lastActive: null },
+    { id: 2, name: "Bob", role: "user", team: null, lastActive: null },
+  ];
+  const r = listUsers({ q: "alice" }, users);
+  assert.deepEqual(r.users.map((u) => u.name), ["Alice"]);
+});
+
+test("name 検索 (q) は case-insensitive: q=ALICE で alice が返る", () => {
+  const users = [
+    { id: 1, name: "alice", role: "user", team: null, lastActive: null },
+    { id: 2, name: "Bob", role: "user", team: null, lastActive: null },
+  ];
+  const r = listUsers({ q: "ALICE" }, users);
+  assert.deepEqual(r.users.map((u) => u.name), ["alice"]);
+});
+
 for (const q of ["page=abc", "page=0", "page=-1", "size=abc", "size=0", "size=-1", "size=101"]) {
   test(`不正な ${q} は 400 invalid_query を返す`, () => {
     const res = get(`/api/users?${q}`);
