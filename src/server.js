@@ -1,5 +1,5 @@
 import http from "node:http";
-import { listUsers, getUser, InvalidQueryError } from "./users.js";
+import { listUsers, getUser, InvalidQueryError, InvalidRoleError } from "./users.js";
 
 export function handle(req, res) {
   const url = new URL(req.url, "http://localhost");
@@ -24,6 +24,10 @@ export function handle(req, res) {
     res.writeHead(404,{ "content-type": "application/json; charset=utf-8" });
     res.end(JSON.stringify({ error: "not_found" }));
   } catch (error) {
+    if (error instanceof InvalidRoleError) {
+      res.writeHead(400, { "content-type": "application/json; charset=utf-8" });
+      return res.end(JSON.stringify({ error: "invalid_role" }));
+    }
     if (error instanceof InvalidQueryError) {
       res.writeHead(400, { "content-type": "application/json; charset=utf-8" });
       return res.end(JSON.stringify({ error: "invalid_query" }));
