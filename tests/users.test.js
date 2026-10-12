@@ -1,6 +1,16 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { listUsers } from "../src/users.js";
+import { handle } from "../src/server.js";
+
+function get(path) {
+  const res = {
+    writeHead(status) { this.status = status; },
+    end(body) { this.body = body; },
+  };
+  handle({ method: "GET", url: path }, res);
+  return res;
+}
 
 test("全員を返す", () => {
   const r = listUsers({});
@@ -27,4 +37,16 @@ test("role で絞り込む", () => {
   const r = listUsers({ role: "admin" });
   assert.deepEqual(r.users.map((u) => u.id), [1]);
   assert.equal(r.lastActive, "2026-10-09T09:12:00Z");
+});
+
+for (const q of ["page=abc", "page=0", "page=-1", "size=abc", "size=0", "size=-1", "size=101"]) {
+  test(`不正な ${q} は 400 invalid_query を返す`, () => {
+    const res = get(`/api/users?${q}`);
+    assert.equal(res.status, 400);
+    assert.deepEqual(JSON.parse(res.body), { error: "invalid_query" });
+  });
+}
+
+test("size=100 は有効", () => {
+  assert.equal(get("/api/users?size=100").status, 200);
 });
