@@ -1,5 +1,7 @@
 import { USERS } from "./data.js";
 
+export class InvalidQueryError extends Error {}
+
 /**
  * GET /api/users の中身。role で絞り込み、page・size でページに分ける。
  * 返す形は docs/api.md のとおり。
@@ -8,6 +10,9 @@ export function listUsers(query = {}, users = USERS) {
   const role = query.role || null;
   const page = Number(query.page ?? 1);
   const size = Number(query.size ?? 20);
+  if (!Number.isInteger(page) || page < 1 || !Number.isInteger(size) || size < 1 || size > 100) {
+    throw new InvalidQueryError();
+  }
   const matched = role ? users.filter((u) => u.role === role) : users;
   const items = matched.slice((page - 1) * size, page * size).map((u) => ({
     id: u.id,
