@@ -26,7 +26,9 @@ export function listUsers(query = {}, users = USERS) {
   if (!Number.isInteger(page) || page < 1 || !Number.isInteger(size) || size < 1 || size > 100) {
     throw new InvalidQueryError();
   }
-  const matched = role ? users.filter((u) => u.role === role) : users;
+  const q = query.q ? String(query.q).toLowerCase() : null;
+  const byRole = role ? users.filter((u) => u.role === role) : users;
+  const matched = q ? byRole.filter((u) => u.name.toLowerCase().includes(q)) : byRole;
   const items = matched.slice((page - 1) * size, page * size).map((u) => ({
     id: u.id,
     name: u.name,
