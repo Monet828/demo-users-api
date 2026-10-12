@@ -1,5 +1,5 @@
 import http from "node:http";
-import { listUsers } from "./users.js";
+import { getUser, listUsers } from "./users.js";
 
 export function handle(req, res) {
   const url = new URL(req.url, "http://localhost");
@@ -8,6 +8,16 @@ export function handle(req, res) {
       const body = listUsers(Object.fromEntries(url.searchParams));
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
       return res.end(JSON.stringify(body));
+    }
+    const m = req.method === "GET" && url.pathname.match(/^\/api\/users\/([^/]+)$/);
+    if (m) {
+      const user = getUser(decodeURIComponent(m[1]));
+      if (user) {
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+        return res.end(JSON.stringify(user));
+      }
+      res.writeHead(404, { "content-type": "application/json; charset=utf-8" });
+      return res.end(JSON.stringify({ error: "not_found" }));
     }
     if (req.method === "GET" && url.pathname === "/health") {
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
