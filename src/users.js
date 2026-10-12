@@ -1,6 +1,9 @@
 import { USERS } from "./data.js";
 
 export class InvalidQueryError extends Error {}
+export class InvalidRoleError extends Error {}
+
+const VALID_ROLES = ["admin", "member", "user", "guest", "viewer", "editor", "owner"];
 
 /**
  * GET /api/users/:id の中身。見つからなければ null を返す。
@@ -17,6 +20,7 @@ export function getUser(id, users = USERS) {
  */
 export function listUsers(query = {}, users = USERS) {
   const role = query.role || null;
+  if (role && !VALID_ROLES.includes(role) && !users.some((u) => u.role === role)) throw new InvalidRoleError();
   const page = Number(query.page ?? 1);
   const size = Number(query.size ?? 20);
   if (!Number.isInteger(page) || page < 1 || !Number.isInteger(size) || size < 1 || size > 100) {

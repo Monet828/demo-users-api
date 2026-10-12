@@ -47,6 +47,22 @@ for (const q of ["page=abc", "page=0", "page=-1", "size=abc", "size=0", "size=-1
   });
 }
 
+test("不正な role は 400 invalid_role を返す", () => {
+  const res = get("/api/users?role=invalid_role");
+  assert.equal(res.status, 400);
+  assert.deepEqual(JSON.parse(res.body), { error: "invalid_role" });
+});
+
+test("有効な role は 200 を返す", () => {
+  assert.equal(get("/api/users?role=admin").status, 200);
+});
+
+test("有効な role で一致する利用者がいなければ 200 で空の一覧を返す", () => {
+  const res = get("/api/users?role=user");
+  assert.equal(res.status, 200);
+  assert.equal(JSON.parse(res.body).total, 0);
+});
+
 test("size=100 は有効", () => {
   assert.equal(get("/api/users?size=100").status, 200);
 });
