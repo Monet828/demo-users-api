@@ -12,7 +12,7 @@ export function getUser(id, users = USERS) {
 }
 
 /**
- * GET /api/users の中身。role で絞り込み、page・size でページに分ける。
+ * GET /api/users の中身。role・名前 (q) で絞り込み、page・size でページに分ける。
  * 返す形は docs/api.md のとおり。
  */
 export function listUsers(query = {}, users = USERS) {
@@ -22,7 +22,9 @@ export function listUsers(query = {}, users = USERS) {
   if (!Number.isInteger(page) || page < 1 || !Number.isInteger(size) || size < 1 || size > 100) {
     throw new InvalidQueryError();
   }
-  const matched = role ? users.filter((u) => u.role === role) : users;
+  const q = query.q || null;
+  const byRole = role ? users.filter((u) => u.role === role) : users;
+  const matched = q ? byRole.filter((u) => u.name.includes(q)) : byRole;
   const items = matched.slice((page - 1) * size, page * size).map((u) => ({
     id: u.id,
     name: u.name,

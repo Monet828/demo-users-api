@@ -51,6 +51,28 @@ test("size=100 は有効", () => {
   assert.equal(get("/api/users?size=100").status, 200);
 });
 
+test("GET /api/users?q=... は名前に q を含む利用者だけを返す", () => {
+  const res = get(`/api/users?q=${encodeURIComponent("鈴木")}`);
+  assert.equal(res.status, 200);
+  const body = JSON.parse(res.body);
+  assert.deepEqual(body.users.map((u) => u.id), [2]);
+  assert.equal(body.total, 1);
+});
+
+test("GET /api/users?q=... は部分一致で複数件を返す", () => {
+  const res = get(`/api/users?q=${encodeURIComponent("子")}`);
+  assert.equal(res.status, 200);
+  assert.deepEqual(JSON.parse(res.body).users.map((u) => u.id), [1]);
+});
+
+test("GET /api/users?q=... は一致しなければ空を返す", () => {
+  const res = get(`/api/users?q=${encodeURIComponent("存在しない名前")}`);
+  assert.equal(res.status, 200);
+  const body = JSON.parse(res.body);
+  assert.deepEqual(body.users, []);
+  assert.equal(body.total, 0);
+});
+
 test("GET /api/users/:id は該当の利用者を返す", () => {
   const res = get("/api/users/1");
   assert.equal(res.status, 200);
