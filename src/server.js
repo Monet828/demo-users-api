@@ -1,5 +1,5 @@
 import http from "node:http";
-import { listUsers, InvalidQueryError } from "./users.js";
+import { listUsers, getUser, InvalidQueryError } from "./users.js";
 
 export function handle(req, res) {
   const url = new URL(req.url, "http://localhost");
@@ -8,6 +8,14 @@ export function handle(req, res) {
       const body = listUsers(Object.fromEntries(url.searchParams));
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
       return res.end(JSON.stringify(body));
+    }
+    const m = req.method === "GET" && url.pathname.match(/^\/api\/users\/([^/]+)$/);
+    if (m) {
+      const user = getUser(m[1]);
+      if (user) {
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+        return res.end(JSON.stringify(user));
+      }
     }
     if (req.method === "GET" && url.pathname === "/health") {
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
