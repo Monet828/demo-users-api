@@ -5,7 +5,14 @@ export function handle(req, res) {
   const url = new URL(req.url, "http://localhost");
   try {
     if (req.method === "GET" && url.pathname === "/api/users") {
-      const body = listUsers(Object.fromEntries(url.searchParams));
+      const query = Object.fromEntries(url.searchParams);
+      const page = query.page === undefined ? 1 : Number(query.page);
+      const size = query.size === undefined ? 20 : Number(query.size);
+      if (!Number.isInteger(page) || page < 1 || !Number.isInteger(size) || size < 1 || size > 100) {
+        res.writeHead(400, { "content-type": "application/json; charset=utf-8" });
+        return res.end(JSON.stringify({ error: "invalid_query" }));
+      }
+      const body = listUsers(query);
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
       return res.end(JSON.stringify(body));
     }
